@@ -99,28 +99,41 @@ static const vibe_param PARAMS[P_COUNT] = {
 #undef PV
 #undef PE
 
+/* Standard-editor mapping: the FX tab collects the whole rack. Delay and
+ * gated reverb stay under SPACE; vibrato is an LFO, not an effect. Parameter
+ * ids are unchanged - only the cards they appear on move. */
 static const char *const GROUPS[P_COUNT] = {
-  "A · SOUND","A · SOUND","A · SOUND","A · SOUND",
-  "B · SYNTH","B · SYNTH","B · SYNTH","B · SYNTH","B · SYNTH","B · SYNTH",
-  "B · SYNTH","B · SYNTH","B · SYNTH","B · SYNTH",
-  "C · DRUMS","C · DRUMS","C · DRUMS","C · DRUMS","C · DRUMS",
-  "D · GROOVE","D · GROOVE","D · GROOVE","D · GROOVE","D · GROOVE",
-  "E · FUNK FX","E · FUNK FX","E · FUNK FX","E · FUNK FX","E · FUNK FX","E · FUNK FX",
-  "E · FUNK FX","E · FUNK FX","E · FUNK FX","E · FUNK FX","E · FUNK FX","E · FUNK FX","E · FUNK FX",
-  "F · MOD","F · MOD","F · MOD","F · MOD","F · MOD","F · MOD",
-  "G · SPACE","G · SPACE","G · SPACE","G · SPACE","G · SPACE","G · SPACE",
-  "G · MASTER"
+  "SOUND · VOICE","SOUND · VOICE","SOUND · VOICE","SOUND · VOICE",
+  "SYNTH · ENGINE","SYNTH · ENGINE","SYNTH · ENGINE","SYNTH · ENGINE",
+  "SYNTH · ENGINE","SYNTH · ENGINE","SYNTH · ENGINE","SYNTH · ENGINE",
+  "LFO · VIBRATO","LFO · VIBRATO",
+  "DRUMS · DRUMS","DRUMS · DRUMS","DRUMS · DRUMS","DRUMS · DRUMS","DRUMS · DRUMS",
+  "GROOVE · PATTERN","GROOVE · PATTERN","GROOVE · PATTERN","GROOVE · PATTERN","GROOVE · PATTERN",
+  "FX · DYNAMICS","FX · DYNAMICS","FX · DYNAMICS",
+  "FX · EQ","FX · EQ","FX · EQ",
+  "FX · WAH","FX · WAH","FX · WAH","FX · WAH","FX · WAH","FX · WAH","FX · WAH",
+  "FX · MOD FX","FX · MOD FX","FX · MOD FX",
+  "FX · ROTARY","FX · ROTARY","FX · ROTARY",
+  "SPACE · DELAY","SPACE · DELAY","SPACE · DELAY",
+  "SPACE · REVERB","SPACE · REVERB","SPACE · REVERB",
+  "SYSTEM · OUTPUT"
 };
 
+/* Rack order for the standard editor, so the cards read like the signal flow. */
 static const vibe_card CARDS[] = {
-  { "SOUND",   8, "34 original funk voices: DX FM, analog VA and drawbar organs." },
-  { "SYNTH",  12, "Envelopes, FM index, filter brightness and modulation." },
-  { "DRUMS",  12, "808/909-style voices; pads 1-8 trigger, pads 9-16 launch grooves." },
-  { "GROOVE", 12, "16-step patterns. PLAY runs a groove; the DAW transport leads when present." },
-  { "FUNK FX",12, "Tape sat, comp, EQ, auto wah, Dimension D, chorus and phaser." },
-  { "MOD",    12, "Dual-rotor rotary speaker, slow/fast and stereo mix." },
-  { "SPACE",  12, "Analog ping-pong echo and gated reverb." },
-  { "MASTER",  6, "Overall output level." }
+  { "VOICE",    6, "34 original funk voices: DX FM, analog VA and drawbar organs." },
+  { "ENGINE",   6, "Envelopes, FM index, brightness, velocity and spread." },
+  { "VIBRATO",  4, "Pitch LFO depth and rate." },
+  { "DRUMS",    6, "808/909-style voices; pads 1-8 trigger, pads 9-16 launch grooves." },
+  { "PATTERN",  6, "16-step grooves. PLAY runs one; the DAW transport leads when present." },
+  { "DYNAMICS", 4, "Tape / triode saturation and the compressor." },
+  { "EQ",       4, "Three-band funk EQ." },
+  { "WAH",      6, "Auto, envelope and talk wah: mode, sweep and band limits." },
+  { "MOD FX",   4, "Chorus, Dimension D and phaser." },
+  { "ROTARY",   6, "Dual-rotor rotary speaker with slow / fast motors." },
+  { "DELAY",    6, "Stereo ping-pong echo." },
+  { "REVERB",   6, "Gated reverb: room size and gate." },
+  { "OUTPUT",   4, "Overall output level." }
 };
 
 /* ---- pages ----------------------------------------------------------------- */
@@ -809,13 +822,14 @@ void vibe_on_init(float sample_rate)
   vibe_param_groups(GROUPS);
   vibe_editor_cards(CARDS, (int)(sizeof CARDS / sizeof CARDS[0]));
   vibe_editor_accent(C_ACC);
-  vibe_editor_tab_color("A", C_ACC);
-  vibe_editor_tab_color("B", C_GOLD);
-  vibe_editor_tab_color("C", C_VIOLET);
-  vibe_editor_tab_color("D", C_AVO);
-  vibe_editor_tab_color("E", C_BLUE);
-  vibe_editor_tab_color("F", 0xFF6EC7);
-  vibe_editor_tab_color("G", C_RED);
+  vibe_editor_tab_color("SOUND", C_ACC);
+  vibe_editor_tab_color("SYNTH", C_GOLD);
+  vibe_editor_tab_color("LFO", 0xFF6EC7);
+  vibe_editor_tab_color("DRUMS", C_VIOLET);
+  vibe_editor_tab_color("GROOVE", C_AVO);
+  vibe_editor_tab_color("FX", C_BLUE);
+  vibe_editor_tab_color("SPACE", C_RED);
+  vibe_editor_tab_color("SYSTEM", C_CREAM);
 
   vibe_editor_control(P_PATCH, VIBE_CTL_MENU);
   vibe_editor_control(P_OCTAVE, VIBE_CTL_MENU);
