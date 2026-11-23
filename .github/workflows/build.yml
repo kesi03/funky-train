@@ -1,0 +1,52 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Zig 0.13.0
+        shell: bash
+        run: |
+          curl -fsSLo zig.tar.xz https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz
+          tar -xf zig.tar.xz
+          echo "$GITHUB_WORKSPACE/zig-linux-x86_64-0.13.0" >> "$GITHUB_PATH"
+
+      - name: Fetch Vibe SDK
+        shell: bash
+        run: sh scripts/fetch-sdk.sh
+
+      - name: Build firmware
+        shell: bash
+        run: sh sdk/tools/build.sh ../firmware/funky-train
+
+      - name: Validate firmware
+        shell: bash
+        run: node sdk/tools/vibe-check.mjs sdk/build/funky-train.wasm --manifest firmware/funky-train/firmware.json --seconds 5
+
+      - name: Render scripted audio and display
+        shell: bash
+        run: |
+          mkdir -p sdk/build/funky-train-test
+          node sdk/tools/wasmtest.mjs sdk/build/funky-train.wasm \
+            firmware/funky-train/wasmtest.json sdk/build/funky-train-test
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: funky-train
+          path: |
+            sdk/build/funky-train.zip
+            sdk/build/funky-train.wasm
